@@ -1,13 +1,14 @@
+import os
 from flask import Flask, request, jsonify
 from sentence_transformers import SentenceTransformer, util
 import json
 import torch
 from textblob import TextBlob
 import datetime
-from flask_cors import CORS  # Import CORS
+from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app)
 
 # Load the SBERT model
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
@@ -67,7 +68,7 @@ def log_chat(user_input, corrected_input, response):
 def home():
     return "Chatbot is running."
 
-@app.route('/api/chat', methods=['POST'])  # Changed route to /api/chat
+@app.route('/api/chat', methods=['POST'])
 def chat():
     try:
         user_input = request.json.get('message', '')
@@ -85,4 +86,5 @@ def chat():
         return jsonify(response="An error occurred: {}".format(str(e))), 500
 
 if __name__ == '__main__':
-    app.run(port=8000, debug=True, threaded=True)
+    port = int(os.environ.get("PORT", 10000))  # Use Render's expected port
+    app.run(host="0.0.0.0", port=port, debug=True, threaded=True)
