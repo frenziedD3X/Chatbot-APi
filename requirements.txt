@@ -9,3 +9,4 @@ scikit-learn
 pandas
 sentence-transformers
 textblob
+pyspellchecker
