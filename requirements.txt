@@ -1,12 +1,7 @@
 accelerate
-Flask
-transformers
+Flask  
 torch
 flask-cors
 gunicorn
-numpy
-scikit-learn
-pandas
 sentence-transformers
-textblob
 pyspellchecker
