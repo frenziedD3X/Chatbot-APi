@@ -1,7 +1,6 @@
-accelerate
-Flask  
-torch
-flask-cors
-gunicorn
-sentence-transformers
-pyspellchecker
+Flask==2.3.2
+torch==2.0.1+cpu        # CPU-optimized version
+flask-cors==3.0.10
+gunicorn==20.1.0
+sentence-transformers==2.2.2
+pyspellchecker==0.6.2
