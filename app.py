@@ -22,7 +22,7 @@ for intent in intents['intents']:
 all_patterns = list(pattern_to_intent.keys())
 
 def predict_tag(sentence, threshold=0.5):
-    closest_matches = difflib.get_close_matches(sentence, all_patterns, n=1, cutoff=threshold)
+    closest_matches = difflib.get_close_matches(sentence, all_patterns, n=1, cutoff=threshold = 0.7)
     
     if closest_matches:
         best_match = closest_matches[0]
