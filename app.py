@@ -1,45 +1,35 @@
-import os
 from flask import Flask, request, jsonify
 from sentence_transformers import SentenceTransformer, util
 import json
 import torch
-from spellchecker import SpellChecker  # Using pyspellchecker
+from textblob import TextBlob
 import datetime
-from flask_cors import CORS
-import io
+from flask_cors import CORS  # Import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Enable CORS for all routes
 
-# Lazy-load the SBERT model
-model = None
-
-def get_model():
-    global model
-    if model is None:
-        model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-    return model
+# Load the SBERT model
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 # Load the database of intents and responses
 with open('database.json', 'r') as f:
     intents = json.load(f)
 
-# Precompute encodings for intent patterns
-intent_encodings = {
-    intent['tag']: get_model().encode(intent['patterns'], convert_to_tensor=True)
-    for intent in intents['intents']
-}
-
-# Initialize the spell checker
-spell = SpellChecker()
+# Encode the patterns for all intents
+intent_encodings = {}
+for intent in intents['intents']:
+    tag = intent['tag']
+    patterns = intent['patterns']
+    intent_encodings[tag] = model.encode(patterns, convert_to_tensor=True)
 
 def correct_spelling(user_input):
-    words = user_input.split()
-    corrected_words = [spell.correction(word) if word not in spell else word for word in words]
-    return " ".join(corrected_words)
+    blob = TextBlob(user_input)
+    corrected_text = str(blob.correct())
+    return corrected_text
 
 def predict_tag(sentence, threshold=0.5):
-    sentence_embedding = get_model().encode(sentence, convert_to_tensor=True)
+    sentence_embedding = model.encode(sentence, convert_to_tensor=True)
     
     max_similarity = -1
     predicted_tag = None
@@ -66,19 +56,18 @@ def get_response(predicted_tag):
             return intent['responses']
     return ["Sorry, I don't understand that."]
 
-# Optional in-memory logging
-log_buffer = io.StringIO()
-
 def log_chat(user_input, corrected_input, response):
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     log_entry = f"{timestamp} - User Input: {user_input} | Corrected Input: {corrected_input} | Response: {response}\n"
-    log_buffer.write(log_entry)
+    
+    with open('chat_log.txt', 'a') as log_file:
+        log_file.write(log_entry)
 
 @app.route('/')
 def home():
     return "Chatbot is running."
 
-@app.route('/api/chat', methods=['POST'])
+@app.route('/api/chat', methods=['POST'])  # Changed route to /api/chat
 def chat():
     try:
         user_input = request.json.get('message', '')
@@ -96,5 +85,4 @@ def chat():
         return jsonify(response="An error occurred: {}".format(str(e))), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))  # Use Render's expected port
-    app.run(host="0.0.0.0", port=port, debug=False, threaded=False)
+    app.run(port=10000, debug=False)
