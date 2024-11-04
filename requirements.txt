@@ -1,8 +1,5 @@
-torch
 flask-cors
 gunicorn
-sentence-transformers
 textblob
 Flask
-sentence-transformers
 
