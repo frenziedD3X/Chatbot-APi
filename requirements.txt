@@ -2,7 +2,7 @@ torch
 flask-cors
 gunicorn
 sentence-transformers
-pyspellchecker
+textblob
 Flask
 sentence-transformers
 
