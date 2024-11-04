@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from textblob import TextBlob
 import json
 import datetime
 from flask_cors import CORS
@@ -21,11 +20,6 @@ for intent in intents['intents']:
 
 # Convert patterns to a list for use with difflib
 all_patterns = list(pattern_to_intent.keys())
-
-def correct_spelling(user_input):
-    blob = TextBlob(user_input)
-    corrected_text = str(blob.correct())
-    return corrected_text
 
 def predict_tag(sentence, threshold=0.5):
     closest_matches = difflib.get_close_matches(sentence, all_patterns, n=1, cutoff=threshold)
@@ -63,13 +57,12 @@ def chat():
         if not user_input:
             return jsonify(response="Please provide a valid input."), 400
 
-        corrected_input = correct_spelling(user_input)
-        predicted_tag = predict_tag(corrected_input)
+        predicted_tag = predict_tag(user_input)
         response = get_response(predicted_tag)
 
-        log_chat(user_input, corrected_input, response[0])
+        log_chat(user_input, user_input, response[0])
 
-        return jsonify(response=response[0], corrected_input=corrected_input)
+        return jsonify(response=response[0], user_input=user_input)
     except Exception as e:
         return jsonify(response="An error occurred: {}".format(str(e))), 500
 
