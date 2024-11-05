@@ -1,14 +1,14 @@
 # Chatbot API
 
 This project is a simple chatbot application that can be used in two ways:
-1. By using the hosted API at `https://chatbot-api-1-j5zd.onrender.com/api/chat` (no installation needed).
-2. By running the chatbot locally (requires installation).
+1. By using the hosted API at `https://chatbot-api-1-j5zd.onrender.com/api/chat` (no setup required).
+2. By running the chatbot locally using a Flask server (requires Python and Flask).
 
 ## Table of Contents
 - [Usage Options](#usage-options)
   - [Using the Hosted API](#using-the-hosted-api)
-  - [Running Locally (Optional)](#running-locally-optional)
-- [Example Code](#example-code)
+  - [Running Locally with Flask](#running-locally-with-flask)
+- [Example HTML Code](#example-html-code)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -16,7 +16,7 @@ This project is a simple chatbot application that can be used in two ways:
 
 ### Using the Hosted API
 
-To interact with the chatbot without installation, use the hosted API.
+To interact with the chatbot without any local setup, use the hosted API.
 
 #### API Endpoint
 The Chatbot API endpoint is:
@@ -40,9 +40,9 @@ The API responds with a JSON object:
 }
 ```
 
-### Running Locally (Optional)
+### Running Locally with Flask
 
-If you need to make changes or run the chatbot locally, follow these steps:
+If you prefer to run the chatbot locally on your machine, you can use the provided Flask server.
 
 1. Clone the repository:
    ```bash
@@ -52,66 +52,100 @@ If you need to make changes or run the chatbot locally, follow these steps:
    ```bash
    cd Chatbot-APi
    ```
-3. Install dependencies:
+3. Ensure Python and Flask are installed. If Flask is not installed, you can add it via:
    ```bash
-   npm install
+   pip install Flask
    ```
-4. Start the local server (you may need to adjust the server script file if specified differently):
+4. Start the Flask server:
    ```bash
-   npm start
+   python app.py
    ```
-5. Open the chatbot front-end HTML file in a browser to interact with the chatbot locally.
+5. The Flask server will be available at `http://localhost:10000`. You can now interact with the chatbot by using the local API endpoint.
 
-## Example Code
-
-Here’s a JavaScript example for interacting with the chatbot, either by using the hosted API or a local server URL if running locally.
-
-```javascript
-// Use either the hosted API URL or local server URL
-const apiUrl = 'https://chatbot-api-1-j5zd.onrender.com/api/chat';
-
-async function sendMessage() {
-    const userInput = document.getElementById("user-input");
-    const message = userInput.value.trim();
-
-    if (message === "") {
-        return;
-    }
-
-    // Display the user's message
-    displayMessage(message, "user-message");
-
-    try {
-        const response = await fetch(apiUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ message })
-        });
-
-        const data = await response.json();
-        displayMessage(data.response, "bot-message");
-    } catch (error) {
-        console.error("Error communicating with API:", error);
-        displayMessage("Error: Could not reach chatbot API.", "bot-message");
-    }
-
-    // Clear the input field
-    userInput.value = "";
-}
-
-function displayMessage(message, className) {
-    const chatBox = document.getElementById("chat-box");
-    const messageElement = document.createElement("div");
-    messageElement.className = `message ${className}`;
-    messageElement.innerText = message;
-    chatBox.appendChild(messageElement);
-
-    // Auto-scroll to the latest message
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
+#### Local API Endpoint
+The local API endpoint will be:
+```plaintext
+POST http://localhost:10000/api/chat
 ```
+
+## Example HTML Code
+
+Here’s a sample HTML file for interacting with the chatbot API. It can use either the hosted API or the local Flask server.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
+    <style>
+        #chat-box { width: 300px; height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+        .message { margin: 5px 0; }
+        .user-message { text-align: right; color: blue; }
+        .bot-message { text-align: left; color: green; }
+    </style>
+</head>
+<body>
+
+<div id="chat-box"></div>
+<input type="text" id="user-input" placeholder="Type your message here...">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+    // Use either the hosted API URL or the local Flask server URL
+    const apiUrl = 'https://chatbot-api-1-j5zd.onrender.com/api/chat';  // Replace with 'http://localhost:10000/api/chat' for local testing
+
+    async function sendMessage() {
+        const userInput = document.getElementById("user-input");
+        const message = userInput.value.trim();
+
+        if (message === "") {
+            return;
+        }
+
+        // Display the user's message
+        displayMessage(message, "user-message");
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            displayMessage(data.response, "bot-message");
+        } catch (error) {
+            console.error("Error communicating with API:", error);
+            displayMessage("Error: Could not reach chatbot API.", "bot-message");
+        }
+
+        // Clear the input field
+        userInput.value = "";
+    }
+
+    function displayMessage(message, className) {
+        const chatBox = document.getElementById("chat-box");
+        const messageElement = document.createElement("div");
+        messageElement.className = `message ${className}`;
+        messageElement.innerText = message;
+        chatBox.appendChild(messageElement);
+
+        // Auto-scroll to the latest message
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
+```
+
+To switch between the hosted API and the local Flask server, change the `apiUrl` in the script:
+- For the hosted API: `const apiUrl = 'https://chatbot-api-1-j5zd.onrender.com/api/chat';`
+- For local testing: `const apiUrl = 'http://localhost:10000/api/chat';`
 
 ## Contributing
 Feel free to open issues or submit pull requests to improve this project.
